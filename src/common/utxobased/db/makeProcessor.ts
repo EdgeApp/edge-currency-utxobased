@@ -315,40 +315,9 @@ export async function makeProcessor(
       opts: EdgeGetTransactionsOptions
     ): Promise<IProcessorTransaction[]> {
       // Lock transaction tables
-      return await baselets.tx(async tables => {
-        const {
-          startEntries,
-          startIndex,
-          startDate = new Date(0),
-          endDate = new Date()
-        } = opts
-
-        // Fetch transaction IDs ordered by date
-        let txData: TxsByDate
-        if (startEntries != null && startIndex != null) {
-          txData = await tables.txsByDate.queryByCount(
-            '',
-            startEntries,
-            startIndex
-          )
-        } else {
-          txData = await tables.txsByDate.query(
-            '',
-            startDate.getTime(),
-            endDate.getTime()
-          )
-        }
-
-        // Fetch transaction data from the IDs
-        const txs = await Promise.all(
-          txData.map(
-            async ({ [RANGE_ID_KEY]: txId }) =>
-              await baselets.all.txById.query('', [txId]).then(([tx]) => tx)
-          )
-        )
-        // Make sure only existing transactions are returned
-        return txs.filter(tx => tx != null)
-      })
+      return await baselets.tx(
+        async tables => await fetchTransactions({ ...opts, tables })
+      )
     },
 
     async saveTransaction(tx: IProcessorTransaction): Promise<void> {
@@ -814,6 +783,86 @@ const fetchTx = async (args: FetchTxArgs): Promise<TxById> => {
 
   const [data] = await tables.txById.query('', [txid])
   return data
+}
+
+interface FetchTransactionsArgs extends EdgeGetTransactionsOptions {
+  tables: TransactionTables
+}
+
+/**
+ * Fetches a transaction object from the database. Returns `undefined` if no transaction
+ * was found for the given `txid`.
+ * @param args {FetchTxArgs}
+ * @returns A `ProcessorTransaction` object or `undefined`
+ */
+const fetchTransactions = async (args: FetchTransactionsArgs): Promise<any> => {
+  const {
+    tables,
+    startEntries,
+    startIndex,
+    startDate = new Date(0),
+    endDate = new Date()
+  } = args
+  const startTime = startDate.getTime()
+  const endTime = endDate.getTime()
+
+  let txData: TxsByDate = []
+  if (startEntries != null) {
+    if (startIndex != null) {
+      // Get txs by count
+      txData = await tables.txsByDate.queryByCount('', startEntries, startIndex)
+    } else {
+      // Loop by start date until we find request count
+      const loop = async (dateStart: Date): Promise<void> => {
+        const dateEnd = new Date(dateStart.getDate() + 1)
+        const txs = await tables.txsByDate.query(
+          '',
+          dateStart.getTime(),
+          dateEnd.getTime()
+        )
+        const txsNeeded = startEntries - txData.length
+        txData = [...txData, ...txs.slice(0, txsNeeded)]
+        if (txData.length < startEntries) await loop(dateEnd)
+      }
+      await loop(startDate)
+    }
+  } else if (startIndex != null) {
+    // Loop by count until we get all tx from end date
+    const loop = async (indexStart: number): Promise<void> => {
+      const txs: TxsByDate = await tables.txsByDate.queryByCount(
+        '',
+        10,
+        indexStart
+      )
+
+      const predicate = (i: number): boolean =>
+        parseInt(txs[i][RANGE_KEY]) <= endTime
+      if (txs.length > 0 && predicate(txs.length - 1)) {
+        txData = [...txData, ...txs]
+        return await loop(indexStart + txData.length)
+      }
+
+      for (let i = txs.length - 1; i >= 0; i--) {
+        if (predicate(i)) {
+          txData = [...txData, ...txs.slice(0, i)]
+          return
+        }
+      }
+    }
+    await loop(startIndex)
+  } else {
+    txData = await tables.txsByDate.query('', startTime, endTime)
+  }
+
+  // Fetch transaction data from the IDs
+  const txs = await Promise.all(
+    txData.map(
+      async ({ [RANGE_ID_KEY]: txId }) =>
+        await tables.txById.query('', [txId]).then(([tx]) => tx)
+    )
+  )
+  // Make sure only existing transactions are returned
+  return txs.filter(tx => tx != null)
 }
 
 interface SaveTxArgs {
