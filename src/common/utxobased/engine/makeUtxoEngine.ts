@@ -342,7 +342,7 @@ export async function makeUtxoEngine(
       await processor.clearAll()
       // clear the networking cache
       await pluginState.clearCache()
-      await metadata.clear()
+      await metadata.clear(currencyInfo.currencyCode)
 
       // finally restart the state
       await state.start()

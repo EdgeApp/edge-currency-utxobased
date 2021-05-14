@@ -86,6 +86,8 @@ export function makeServerStates(config: ServerStateConfig): ServerStates {
       const blockBook = connections.get(uri)
       if (blockBook == null) continue
       await blockBook.disconnect()
+      connections.delete(uri)
+      serverStates.delete(uri)
     }
   }
 
