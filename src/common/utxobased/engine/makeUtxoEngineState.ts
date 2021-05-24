@@ -7,6 +7,7 @@ import {
   EdgeWalletInfo
 } from 'edge-core-js'
 
+import { AddressDataUnknownError } from '../../plugin/errors'
 import { EngineEmitter, EngineEvent } from '../../plugin/makeEngineEmitter'
 import {
   AddressPath,
@@ -749,7 +750,7 @@ interface FindLastUsedIndexArgs extends FormatArgs {}
 const findLastUsedIndex = async (
   args: FindLastUsedIndexArgs
 ): Promise<number> => {
-  const { format, branch, currencyInfo, processor } = args
+  const { format, branch, currencyInfo, walletTools, processor } = args
 
   const partialPath: Omit<AddressPath, 'addressIndex'> = {
     format,
@@ -762,16 +763,29 @@ const findLastUsedIndex = async (
   let lastUsedIndex = Math.max(addressCount - currencyInfo.gapLimit - 1, 0)
 
   for (let i = lastUsedIndex; i < addressCount; i++) {
-    const { used } = await fetchAddressDataByPath({
-      ...args,
-      path: {
-        ...partialPath,
-        addressIndex: i
-      }
-    })
+    const path: AddressPath = {
+      ...partialPath,
+      addressIndex: i
+    }
 
-    if (used) {
-      lastUsedIndex = i
+    try {
+      const { used } = await fetchAddressDataByPath({ ...args, path })
+      if (used) {
+        lastUsedIndex = i
+      }
+    } catch (err) {
+      // If the address data is not found in the database, save it and continue
+      if (err instanceof AddressDataUnknownError) {
+        const { scriptPubkey } = walletTools.getScriptPubkey(path)
+        await saveAddress({
+          ...args,
+          scriptPubkey,
+          path
+        })
+        continue
+      }
+
+      throw err
     }
   }
 
@@ -792,7 +806,7 @@ const fetchAddressDataByPath = async (
     walletTools.getScriptPubkey(path).scriptPubkey
 
   const addressData = await processor.fetchAddressByScriptPubkey(scriptPubkey)
-  if (addressData == null) throw new Error('Address data unknown')
+  if (addressData == null) throw new AddressDataUnknownError(scriptPubkey)
   return addressData
 }
 
