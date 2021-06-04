@@ -2,6 +2,7 @@ import * as chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { Disklet, makeMemoryDisklet } from 'disklet'
 import { MemoryStorage } from 'disklet/lib/src/backends/memory'
+import { EdgeLog } from 'edge-core-js'
 
 import {
   EngineEmitter,
@@ -19,13 +20,15 @@ describe('makeMetadata', () => {
   const memory: MemoryStorage = {}
   let disklet: Disklet
   let metadata: Metadata
+  let log: EdgeLog
   const emitter = new EngineEmitter()
 
   before(async () => {
     disklet = makeMemoryDisklet(memory)
     metadata = await makeMetadata({
       disklet,
-      emitter
+      emitter,
+      log
     })
   })
 

@@ -628,6 +628,14 @@ export async function makeProcessor(
     Parameters<typeof processor.removeSpentUtxo>[0],
     Await<ReturnType<typeof processor.removeSpentUtxo>>
   >(processor.removeSpentUtxo)
+  processor.getUsedAddress = await mutexDecorator<
+    Parameters<typeof processor.getUsedAddress>[0],
+    Await<ReturnType<typeof processor.getUsedAddress>>
+  >(processor.getUsedAddress)
+  processor.saveUsedAddress = await mutexDecorator<
+    Parameters<typeof processor.saveUsedAddress>[0],
+    Await<ReturnType<typeof processor.saveUsedAddress>>
+  >(processor.saveUsedAddress)
 
   return processor
 }

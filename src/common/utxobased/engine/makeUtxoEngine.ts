@@ -72,7 +72,11 @@ export async function makeUtxoEngine(
     log: config.options.log
   })
 
-  const metadata = await makeMetadata({ disklet: walletLocalDisklet, emitter })
+  const metadata = await makeMetadata({
+    disklet: walletLocalDisklet,
+    emitter,
+    log
+  })
   const processor = await makeProcessor({
     disklet: walletLocalDisklet,
     emitter
