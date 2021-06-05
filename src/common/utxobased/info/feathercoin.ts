@@ -30,12 +30,7 @@ export const info: EngineCurrencyInfo = {
   // Configuration options:
   defaultSettings: {
     customFeeSettings: ['satPerByte'],
-    electrumServers: [
-      'electrum://electrumx-ch-1.feathercoin.ch:50001',
-      'electrum://electrumx-de-2.feathercoin.ch:50001',
-      'electrum://electrumxftc.trezarcoin.com:50001',
-      'electrum://electrum.feathercoin.network:50001'
-    ],
+    blockBookServers: [],
     disableFetchingServers: false
   },
   metaTokens: [],

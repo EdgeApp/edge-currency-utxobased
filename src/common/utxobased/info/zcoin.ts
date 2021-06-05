@@ -31,14 +31,7 @@ export const info: EngineCurrencyInfo = {
   // Configuration options:
   defaultSettings: {
     customFeeSettings: ['satPerByte'],
-    electrumServers: [
-      'electrum://51.15.82.184:50001',
-      'electrum://45.63.92.224:50001',
-      'electrum://47.75.76.176:50001',
-      'electrums://51.15.82.184:50002',
-      'electrums://45.63.92.224:50002',
-      'electrums://47.75.76.176:50002'
-    ],
+    blockBookServers: ['https://blockbook.zcoin.io/'],
     disableFetchingServers: false
   },
   metaTokens: [],

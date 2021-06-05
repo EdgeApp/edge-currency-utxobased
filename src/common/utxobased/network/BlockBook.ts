@@ -172,17 +172,15 @@ export interface BlockBook {
 
 interface BlockBookConfig {
   emitter: EngineEmitter
-  wsAddress?: string
+  wsAddress: string
   log: EdgeLog
   walletId: string
   onQueueSpaceCB: OnQueueSpaceCB
 }
 
-const baseUri = 'btc1.trezor.io'
-
 export function makeBlockBook(config: BlockBookConfig): BlockBook {
   const { emitter, log, onQueueSpaceCB, walletId } = config
-  const baseWSAddress = config.wsAddress ?? `wss://${baseUri}/websocket`
+  const baseWSAddress = config.wsAddress
   log(`makeBlockBook with uri ${baseWSAddress}`)
 
   const instance: BlockBook = {

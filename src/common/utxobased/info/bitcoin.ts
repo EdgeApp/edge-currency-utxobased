@@ -35,15 +35,12 @@ export const info: EngineCurrencyInfo = {
   // Configuration options:
   defaultSettings: {
     customFeeSettings: ['satPerByte'],
-    electrumServers: [
-      'electrum://electrum-bc-az-eusa.airbitz.co:50001',
-      'electrum://electrum.hsmiths.com:8080',
-      'electrum://node.arihanc.com:50001',
-      'electrum://electrum.petrkr.net:50001',
-      'electrum://electrum2.everynothing.net:50001',
-      'electrum://currentlane.lovebitco.in:50001',
-      'electrum://electrum.hsmiths.com:50001',
-      'electrum://electrumx.westeurope.cloudapp.azure.com:50001'
+    blockBookServers: [
+      'https://btc1.trezor.io',
+      'https://btc2.trezor.io',
+      'https://btc3.trezor.io',
+      'https://btc4.trezor.io',
+      'https://btc5.trezor.io'
     ],
     disableFetchingServers: false
   },

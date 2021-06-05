@@ -32,17 +32,7 @@ export const info: EngineCurrencyInfo = {
   // Configuration options:
   defaultSettings: {
     customFeeSettings: ['satPerByte'],
-    electrumServers: [
-      'electrum://bch.electrumx.cash:50001',
-      'electrums://bch.electrumx.cash:50002',
-      'electrums://satoshi.vision.cash:50002',
-      'electrum://sv1.hsmiths.com:60003',
-      'electrums://sv1.hsmiths.com:60004',
-      'electrum://electrumx-sv.1209k.com:50001',
-      'electrums://electrumx-sv.1209k.com:50002',
-      'electrum://electroncash.cascharia.com:50001',
-      'electrums://electroncash.cascharia.com:50002'
-    ],
+    blockBookServers: [],
     disableFetchingServers: false
   },
   metaTokens: [],

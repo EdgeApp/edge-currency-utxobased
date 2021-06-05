@@ -26,7 +26,7 @@ export function makeCurrencyPlugin(
   const { defaultSettings, pluginId, currencyCode } = currencyInfo
   const {
     customFeeSettings,
-    electrumServers,
+    blockBookServers,
     disableFetchingServers
   } = defaultSettings
   const state = new PluginState({
@@ -36,7 +36,7 @@ export function makeCurrencyPlugin(
     log,
     defaultSettings: {
       customFeeSettings,
-      electrumServers,
+      blockBookServers,
       disableFetchingServers
     }
   })
