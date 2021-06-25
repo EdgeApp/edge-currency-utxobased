@@ -11,7 +11,7 @@ import {
   asString
 } from 'cleaners'
 
-import { AddressPath } from '../../plugin/types'
+import { AddressPath, asAddressPath } from '../../plugin/types'
 import { ScriptTypeEnum } from '../keymanager/keymanager'
 
 export interface IAddress {
@@ -23,17 +23,10 @@ export interface IAddress {
   used: boolean
   balance: string
 }
-
-export const asIAddressCleaner = asObject({
+export const asIAddress = asObject<IAddress>({
   scriptPubkey: asString,
   networkQueryVal: asNumber,
-  path: asOptional(
-    asObject({
-      format: asString,
-      changeIndex: asNumber,
-      addressIndex: asNumber
-    })
-  ),
+  path: asAddressPath,
   lastQuery: asNumber,
   lastTouched: asNumber,
   used: asBoolean,

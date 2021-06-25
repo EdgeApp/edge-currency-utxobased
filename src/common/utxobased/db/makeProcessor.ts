@@ -26,7 +26,7 @@ import {
   UtxoById
 } from './Models/baselet'
 import {
-  asIAddressCleaner,
+  asIAddress,
   asIProcessorTransactionCleaner,
   asIUTXOCleaner,
   IAddress,
@@ -677,7 +677,7 @@ const saveAddress = async (args: ProcessAndSaveAddressArgs): Promise<void> => {
   const { tables, data } = args
 
   // Make sure that the address does not already exists
-  const cleaner = asArray(asOptional(asIAddressCleaner))
+  const cleaner = asArray(asOptional(asIAddress))
   const [addressData] = cleaner(
     await tables.addressByScriptPubkey.query('', [data.scriptPubkey])
   )
@@ -815,7 +815,7 @@ const fetchAddressesByScriptPubkeys = async (
 
   // Short circuit query to the database
   if (scriptPubkeys.length === 0) return []
-  const cleaner = asArray(asOptional(asIAddressCleaner))
+  const cleaner = asArray(asOptional(asIAddress))
   return cleaner(
     await tables.addressByScriptPubkey.query('', scriptPubkeys)
     // allow any for cleaned string literal type
@@ -923,12 +923,10 @@ const updateAddressByScriptPubkey = async (
   const { tables, scriptPubkey, data } = args
 
   // Make sure there is an address already saved for the given script pubkey
-  const cleaner = asArray(asOptional(asIAddressCleaner))
+  const cleaner = asArray(asOptional(asIAddress))
   const [address]: Array<IAddress | undefined> = cleaner(
     await tables.addressByScriptPubkey.query('', [scriptPubkey])
-    // allow any for the cleaner, since we cannot clean literal types
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any
+  )
   if (address == null) {
     throw new Error('Cannot update address that does not exist')
   }

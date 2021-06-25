@@ -1,4 +1,4 @@
-import { asNumber, asObject, asString } from 'cleaners'
+import { asEither, asNumber, asObject, asString, asValue } from 'cleaners'
 import {
   EdgeCurrencyEngineOptions,
   EdgeCurrencyInfo,
@@ -17,13 +17,20 @@ export enum NetworkEnum {
   Testnet = 'testnet'
 }
 
-export type CurrencyFormat = 'bip32' | 'bip44' | 'bip49' | 'bip84'
+export type CurrencyFormat = ReturnType<typeof asCurrencyFormat>
+export const asCurrencyFormat = asEither(
+  asValue('bip32'),
+  asValue('bip44'),
+  asValue('bip49'),
+  asValue('bip84')
+)
 
-export interface AddressPath {
-  format: CurrencyFormat
-  changeIndex: number
-  addressIndex: number
-}
+export type AddressPath = ReturnType<typeof asAddressPath>
+export const asAddressPath = asObject({
+  format: asCurrencyFormat,
+  changeIndex: asNumber,
+  addressIndex: asNumber
+})
 
 export enum EngineCurrencyType {
   UTXO
