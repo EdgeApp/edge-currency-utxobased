@@ -78,7 +78,7 @@
     "bs58smartcheck": "^2.0.4",
     "disklet": "^0.4.5",
     "edge-core-js": "^0.17.27-alpha.1",
-    "memlet": "^0.0.4",
+    "memlet": "^0.1.1",
     "uri-js": "^4.4.0",
     "url-parse": "^1.4.7",
     "wif-smart": "^2.0.0",
