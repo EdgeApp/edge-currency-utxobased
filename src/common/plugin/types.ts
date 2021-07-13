@@ -1,3 +1,4 @@
+import { asEither, asNumber, asObject, asString, asValue } from 'cleaners'
 import {
   EdgeCurrencyEngineOptions,
   EdgeCurrencyInfo,
@@ -16,13 +17,20 @@ export enum NetworkEnum {
   Testnet = 'testnet'
 }
 
-export type CurrencyFormat = 'bip32' | 'bip44' | 'bip49' | 'bip84'
+export type CurrencyFormat = ReturnType<typeof asCurrencyFormat>
+export const asCurrencyFormat = asEither(
+  asValue('bip32'),
+  asValue('bip44'),
+  asValue('bip49'),
+  asValue('bip84')
+)
 
-export interface AddressPath {
-  format: CurrencyFormat
-  changeIndex: number
-  addressIndex: number
-}
+export type AddressPath = ReturnType<typeof asAddressPath>
+export const asAddressPath = asObject({
+  format: asCurrencyFormat,
+  changeIndex: asNumber,
+  addressIndex: asNumber
+})
 
 export enum EngineCurrencyType {
   UTXO
@@ -54,17 +62,28 @@ export interface EngineCurrencyInfo extends EdgeCurrencyInfo {
 
 export type CustomFeeSetting = 'satPerByte'
 
-export interface FeeRates {
-  lowFee: string
-  standardFeeLow: string
-  standardFeeHigh: string
-  highFee: string
-}
+export type FeeRates = ReturnType<typeof asFeeRatesCleaner>
+
+export const asFeeRatesCleaner = asObject({
+  lowFee: asString,
+  standardFeeLow: asString,
+  standardFeeHigh: asString,
+  highFee: asString
+})
 
 export interface SimpleFeeSettings extends FeeRates {
   standardFeeLowAmount: string
   standardFeeHighAmount: string
 }
+
+export const asSimpleFeeSettingsCleaner = asObject({
+  standardFeeLowAmount: asString,
+  standardFeeHighAmount: asString,
+  lowFee: asString,
+  standardFeeLow: asString,
+  standardFeeHigh: asString,
+  highFee: asString
+})
 
 export interface EngineConfig {
   network: NetworkEnum
@@ -80,7 +99,11 @@ export interface EngineOptions extends EdgeCurrencyEngineOptions {
   emitter: EngineEmitter
 }
 
-export interface LocalWalletMetadata {
-  balance: string
-  lastSeenBlockHeight: number
-}
+export type LocalWalletMetadata = ReturnType<
+  typeof asLocalWalletMetadataCleaner
+>
+
+export const asLocalWalletMetadataCleaner = asObject({
+  balance: asString,
+  lastSeenBlockHeight: asNumber
+})

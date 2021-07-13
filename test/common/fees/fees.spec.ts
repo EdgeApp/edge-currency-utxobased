@@ -1,3 +1,4 @@
+import { fail } from 'assert'
 import * as chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import { makeMemoryDisklet } from 'disklet'
@@ -38,6 +39,10 @@ describe('fees', function () {
         io: fakeIo,
         log: fakeLog
       })
+
+      // make typescript happy with this typecheck
+      if (fees.fees == null)
+        fail('internal fee object should not be null after makeFees')
 
       fees.fees.should.eql(fakeCurrencyInfo.simpleFeeSettings)
 

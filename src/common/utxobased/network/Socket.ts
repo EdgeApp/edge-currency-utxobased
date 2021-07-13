@@ -1,3 +1,4 @@
+import { Cleaner } from 'cleaners'
 import { EdgeLog } from 'edge-core-js'
 
 import { removeItem } from '../../plugin/utils'
@@ -18,14 +19,16 @@ export interface WsTask<T> {
   method: string
   params: unknown
   deferred: Deferred<T>
+  cleaner?: Cleaner<T>
 }
 
-export interface WsSubscription {
+export interface WsSubscription<T> {
   method: string
   params: unknown
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cb: (value: any) => void
   subscribed: boolean
+  cleaner: Cleaner<T>
   deferred: Deferred<unknown>
 }
 
@@ -36,7 +39,8 @@ export interface Socket {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   submitTask: (task: WsTask<any>) => void
   onQueueSpace: (cb: OnQueueSpaceCB) => void
-  subscribe: (subscription: WsSubscription) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  subscribe: (subscription: WsSubscription<any>) => void
   isConnected: () => boolean
 }
 
@@ -60,7 +64,7 @@ interface WsMessage {
 }
 
 interface Subscriptions {
-  [key: string]: WsSubscription
+  [key: string]: WsSubscription<unknown>
 }
 
 interface PendingMessages {
@@ -171,7 +175,9 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
     }
   }
 
-  const subscribe = (subscription: WsSubscription): void => {
+  // add any exception, since the passed in template parameter needs to be re-assigned
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const subscribe = (subscription: WsSubscription<any>): void => {
     if (socket != null && socket.readyState === ReadyState.OPEN && connected) {
       const id = subscription.method
       const message = {
@@ -271,7 +277,11 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
             if (!subscription.subscribed) {
               subscription.deferred.reject()
             }
-            subscription.cb(json.data)
+            if (subscription.cleaner != null) {
+              subscription.cb(subscription.cleaner(json.data))
+            } else {
+              subscription.cb(json.data)
+            }
             return
           }
         }
@@ -287,7 +297,11 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
               error.message != null ? error.message : error.connected
             throw new Error(errorMessage)
           }
-          message.task.deferred.resolve(json.data)
+          if (message.task.cleaner != null) {
+            message.task.deferred.resolve(message.task.cleaner(json.data))
+          } else {
+            message.task.deferred.resolve(json.data)
+          }
         } catch (e) {
           message.task.deferred.reject(e)
         }
@@ -348,7 +362,7 @@ export function makeSocket(uri: string, config: SocketConfig): Socket {
       onQueueSpace = cb
     },
 
-    subscribe(subscription: WsSubscription): void {
+    subscribe(subscription: WsSubscription<unknown>): void {
       subscribe(subscription)
     }
   }

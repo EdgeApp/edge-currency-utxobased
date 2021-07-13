@@ -5,7 +5,7 @@ import { makeMemlet, Memlet } from 'memlet'
 
 import AwaitLock from '../utxobased/engine/await-lock'
 import { EngineEmitter, EngineEvent } from './makeEngineEmitter'
-import { LocalWalletMetadata } from './types'
+import { asLocalWalletMetadataCleaner, LocalWalletMetadata } from './types'
 
 const metadataPath = `metadata.json`
 
@@ -76,7 +76,7 @@ export const makeMetadata = async (
 const fetchMetadata = async (memlet: Memlet): Promise<LocalWalletMetadata> => {
   try {
     const dataStr = await memlet.getJson(metadataPath)
-    return JSON.parse(dataStr)
+    return asLocalWalletMetadataCleaner(JSON.parse(dataStr))
   } catch {
     return await resetMetadata(memlet)
   }

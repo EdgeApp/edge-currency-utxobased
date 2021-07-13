@@ -284,7 +284,10 @@ export async function makeUtxoEngine(
       const setRBF = options?.setRBF ?? false
       const rbfTxid = edgeSpendInfo.rbfTxid
       let maxUtxo: undefined | IUTXO
-      let feeRate = parseInt(await fees.getRate(edgeSpendInfo))
+      const rate = await fees.getRate(edgeSpendInfo)
+      if (rate == null)
+        throw new Error('transaction fee rate could not be retrieved')
+      let feeRate = parseInt(rate)
       if (rbfTxid != null) {
         const rbfTx = await processor.fetchTransaction(rbfTxid)
         if (rbfTx == null) throw new Error('transaction not found')

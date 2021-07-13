@@ -291,6 +291,17 @@ describe('BlockBook', function () {
       tx.fees.should.equal('226')
       tx.blockHeight.should.equal(651329)
       tx.vin[0].value.should.equal('97373')
+      tx.vin[0].txid.should.equal(
+        'fac5994d454817db2daec796cfa79cce670a372e7505fdef2a259289d5df0814'
+      )
+      tx.vin[0].sequence.should.equal(2147483648)
+      tx.vin[0].n.should.equal(0)
+      tx.vin[0].addresses.should.eqls([
+        'bc1qg6lwu6c8yqhhw7rrq69akknepxcft09agkkuqv'
+      ])
+      tx.vin[0].isAddress.should.equal(true)
+      tx.vin[0].value.should.equal('97373')
+
       tx.vout[1].value.should.equal('95000')
       tx.should.have.property('confirmations')
       tx.should.have.property('blockTime')

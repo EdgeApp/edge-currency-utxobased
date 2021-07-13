@@ -1,13 +1,16 @@
 // Typescript translation from original code in edge-currency-bitcoin
 
+import { asNumber, asObject, asString } from 'cleaners'
 import { EdgeLog } from 'edge-core-js'
 
-export interface ServerInfo {
-  serverUrl: string
-  serverScore: number
-  responseTime: number
-  numResponseTimes: number
-}
+export type ServerInfo = ReturnType<typeof asServerInfoCleaner>
+
+export const asServerInfoCleaner = asObject({
+  serverUrl: asString,
+  serverScore: asNumber,
+  responseTime: asNumber,
+  numResponseTimes: asNumber
+})
 
 const RESPONSE_TIME_UNINITIALIZED = 999999999
 const MAX_SCORE = 500
