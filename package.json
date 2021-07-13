@@ -80,7 +80,7 @@
     "edge-core-js": "^0.17.27-alpha.1",
     "memlet": "^0.0.4",
     "uri-js": "^4.4.0",
-    "url-parse": "^1.4.7",
+    "url-parse": "^1.5.0",
     "wif-smart": "^2.0.0",
     "wifgrs": "^2.0.6",
     "ws": "^7.3.1"
